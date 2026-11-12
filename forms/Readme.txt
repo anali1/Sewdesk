@@ -1,0 +1,1 @@
+The contant currently is working through sending of WhatsApp direct contact messages.

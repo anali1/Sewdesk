@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Browse and connect with tailoring and fashion shops on SewDesk.">
+  <title>Browse Shops | SewDesk</title>
+
+  <!-- Bootstrap 5 and Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/img/sewdesk_logo.jpeg" rel="icon"/>
+  <style>
+    :root {
+      --sewdex-navy: #101b46;
+      --sewdex-blue: #172b68;
+      --sewdex-purple: #151fa8;
+      --sewdex-purple-dark: #0f2db3;
+      --page-bg: #f4f5fa;
+      --muted: #77809a;
+      --ink: #17213d;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      background: var(--page-bg);
+      color: var(--ink);
+      font-family: "Open Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    .browse-hero {
+      position: relative;
+      min-height: 278px;
+      padding: 24px 24px 82px;
+      color: #fff;
+      background: linear-gradient(125deg, #152153 0%, #1b3277 56%, #243d86 100%);
+      overflow: hidden;
+    }
+    .browse-hero::after {
+      content: "";
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      right: -120px;
+      top: -260px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.055);
+      pointer-events: none;
+    }
+    .back-link {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,.88);
+      text-decoration: none;
+      font-size: .92rem;
+      transition: color .2s ease;
+    }
+    .back-link:hover { color: #fff; }
+    .hero-center {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      margin: 6px auto 0;
+    }
+    .hero-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 66px;
+      height: 66px;
+      margin-bottom: 14px;
+      border-radius: 19px;
+      color: #fff;
+      background: rgba(157, 117, 255, .32);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.09);
+      font-size: 30px;
+    }
+    .hero-center h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.55rem, 3vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -.5px;
+    }
+    .hero-center p {
+      margin: 0;
+      color: rgba(255,255,255,.78);
+      font-size: .96rem;
+    }
+
+    .search-wrap {
+      position: relative;
+      z-index: 3;
+      width: min(100% - 32px, 1320px);
+      margin: -32px auto 0;
+      padding: 12px 15px;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 8px 28px rgba(15, 27, 67, .12);
+    }
+    .search-inner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 42px;
+    }
+    .search-icon { color: #8992a9; font-size: 1.15rem; padding-left: 2px; }
+    #shopSearch {
+      flex: 1;
+      min-width: 0;
+      height: 42px;
+      padding: 8px 4px;
+      border: 0;
+      outline: 0;
+      color: var(--ink);
+      background: transparent;
+      font-size: .94rem;
+      box-shadow: none;
+    }
+    #shopSearch::placeholder { color: #98a0b3; }
+    .refresh-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      border: 1px solid #d9d0ff;
+      border-radius: 11px;
+      color: var(--sewdex-purple);
+      background: #f7f4ff;
+      transition: .2s ease;
+    }
+    .refresh-btn:hover { color: #fff; background: var(--sewdex-purple); }
+    .refresh-btn:disabled { opacity: .65; cursor: wait; }
+
+    .shops-shell {
+      width: min(100% - 48px, 1280px);
+      min-height: 380px;
+      margin: 16px auto 36px;
+      padding: 23px 20px 30px;
+      border-radius: 25px 25px 0 0;
+      background: #fff;
+      box-shadow: 0 2px 14px rgba(20, 32, 70, .035);
+    }
+    .results-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 2px 16px;
+      color: #8a93a9;
+      font-size: .82rem;
+    }
+    .results-line strong { color: #68738f; font-weight: 600; }
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .shop-card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      min-width: 0;
+      min-height: 136px;
+      padding: 17px 14px 15px 16px;
+      border: 1px solid #eceef4;
+      border-top: 4px solid var(--sewdex-purple);
+      border-radius: 17px;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(20, 32, 70, .055);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .shop-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(20, 32, 70, .09);
+    }
+    .shop-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 64px;
+      width: 64px;
+      height: 64px;
+      overflow: hidden;
+      border-radius: 17px;
+      color: #fff;
+      background: linear-gradient(145deg, #853cff, #5724c8);
+      font-size: 1.2rem;
+      font-weight: 800;
+      box-shadow: 0 3px 7px rgba(91, 39, 194, .17);
+    }
+    .shop-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .shop-info { flex: 1; min-width: 0; align-self: stretch; padding-top: 1px; }
+    .shop-name {
+      margin: 0 0 3px;
+      overflow: hidden;
+      color: #151d32;
+      font-size: .98rem;
+      font-weight: 750;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .shop-owner {
+      margin: 0 0 7px;
+      overflow: hidden;
+      color: #69738d;
+      font-size: .77rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .shop-location {
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+      margin: 0 0 8px;
+      color: #66718c;
+      font-size: .74rem;
+      line-height: 1.35;
+    }
+    .shop-location i { flex: 0 0 auto; color: var(--sewdex-purple); }
+    .shop-code {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      max-width: 100%;
+      padding: 4px 9px;
+      border: 1px solid #eee8ff;
+      border-radius: 20px;
+      color: #383bdd;
+      background: #f8f5ff;
+      font-size: .67rem;
+      white-space: nowrap;
+    }
+    .shop-actions {
+      display: flex;
+      flex: 0 0 40px;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      align-self: center;
+    }
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border: 1px solid #e9e3ff;
+      border-radius: 12px;
+      color: var(--sewdex-purple);
+      background: #f7f4ff;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: .2s ease;
+    }
+    .action-btn:hover { color: #fff; background: var(--sewdex-purple); }
+    .action-btn.details {
+      border-color: var(--sewdex-purple);
+      color: #fff;
+      background: var(--sewdex-purple);
+      font-size: 1.15rem;
+    }
+    .action-btn.details:hover { border-color: var(--sewdex-purple-dark); background: var(--sewdex-purple-dark); }
+
+    .state-panel {
+      grid-column: 1 / -1;
+      padding: 54px 15px;
+      color: #7c859b;
+      text-align: center;
+    }
+    .state-panel i { display: block; margin-bottom: 12px; color: #a28ae5; font-size: 2rem; }
+    .state-panel h3 { margin: 0 0 5px; color: #303b59; font-size: 1.05rem; font-weight: 700; }
+    .state-panel p { margin: 0; font-size: .88rem; }
+    .loading-spinner { width: 2rem; height: 2rem; }
+
+    /* Professional Shop Details modal */
+    .shop-details-dialog { max-width: 448px; margin: 1.25rem auto; }
+    .shop-details-content {
+      height: min(625px, calc(100vh - 2.5rem));
+      min-height: 430px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 0;
+      border-radius: 17px;
+      background: #fff;
+      box-shadow: 0 22px 65px rgba(0,0,0,.25);
+      position: relative;
+    }
+    .shop-details-content::before {
+      content: "";
+      position: absolute;
+      z-index: 2;
+      inset: 0 0 auto;
+      height: 7px;
+      background: var(--sewdex-purple);
+    }
+    .shop-details-header {
+      min-height: 63px;
+      padding: 19px 20px 13px;
+      border-bottom: 1px solid #f0f1f4;
+      flex: 0 0 auto;
+    }
+    .shop-details-header .modal-title {
+      color: #182033;
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .shop-details-body {
+      min-height: 0;
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 16px 20px 12px;
+      scrollbar-width: thin;
+      scrollbar-color: #a6a6a6 transparent;
+    }
+    .shop-details-identity { display:flex; align-items:center; gap:15px; margin-bottom:16px; }
+    .modal-shop-avatar {
+      display:flex; align-items:center; justify-content:center;
+      width:64px; height:64px; flex:0 0 64px; overflow:hidden;
+      border-radius:17px; color:#fff;
+      background:linear-gradient(145deg,#3c3fff,#2450c8);
+      font-size:1.2rem; font-weight:800;
+    }
+    .modal-shop-avatar img { width:100%; height:100%; object-fit:cover; }
+    .shop-details-name { margin:0 0 4px; color:#182033; font-size:18px; line-height:1.25; font-weight:800; }
+    .shop-details-owner { margin:0; color:#697386; font-size:13px; }
+    .shop-quick-actions { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; margin-bottom:16px; }
+    .shop-quick-action {
+      min-width:0; min-height:81px; padding:9px 2px 7px;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px;
+      border-radius:14px; text-decoration:none; font-size:10px; font-weight:600;
+      color:#3e4655; transition:transform .18s ease,filter .18s ease;
+    }
+    .shop-quick-action:hover { transform:translateY(-2px); filter:brightness(.98); color:inherit; }
+    .shop-quick-action.is-unavailable { opacity:.58; cursor:not-allowed; filter:grayscale(.12); }
+    .shop-quick-action.is-unavailable:hover { transform:none; filter:grayscale(.12); }
+    .shop-footer-btn.is-unavailable { opacity:.55; cursor:not-allowed; pointer-events:none; }
+    .shop-quick-action .quick-icon {
+      width:40px; height:40px; display:grid; place-items:center;
+      border-radius:50%; font-size:17px;
+    }
+    .quick-whatsapp { background:#e9fbf0; }
+    .quick-whatsapp .quick-icon { background:#c7f5d9; color:#08b85b; }
+    .quick-call { background:#effbf4; }
+    .quick-call .quick-icon { background:#d7f8e4; color:#08a94e; }
+    .quick-email { background:#eef5ff; }
+    .quick-email .quick-icon { background:#dceaff; color:#2874f0; }
+    .quick-portfolio { background:#f4f0ff; }
+    .quick-portfolio .quick-icon { background:#e9e0ff; color:#853cff; }
+    .quick-book { background:#fff7ed; }
+    .quick-book .quick-icon { background:#ffecd4; color:#f07818; }
+    .shop-detail-row {
+      display:flex; align-items:center; gap:12px; min-height:60px;
+      margin-bottom:11px; padding:12px 13px; border-radius:14px; background:#f7f8fa;
+    }
+    .shop-detail-icon { width:15px; flex:0 0 15px; margin-top:2px; color:var(--sewdex-purple); font-size:16px; text-align:center; }
+    .shop-detail-main { min-width:0; flex:1; }
+    .shop-detail-label { margin-bottom:2px; color:#697386; font-size:11px; line-height:1.3; }
+    .shop-detail-value { margin:0; color:#30394a; font-size:13px; line-height:1.4; overflow-wrap:anywhere; }
+    .shop-detail-buttons { display:flex; flex-shrink:0; align-items:center; gap:6px; }
+    .shop-detail-btn { padding:6px 11px; border-radius:9px; font-size:11px; font-weight:650; white-space:nowrap; }
+    .shop-btn-whatsapp { color:#fff; background:#20cf69; border:1px solid #20cf69; }
+    .shop-btn-whatsapp:hover { color:#fff; background:#14b85a; }
+    .shop-btn-call { color:#08a94e; background:#f4fff8; border:1px solid #a8ecc4; }
+    .shop-btn-email { color:#2874f0; background:#f5f9ff; border:1px solid #bfd6ff; }
+    .shop-details-footer {
+      flex:0 0 auto; padding:12px 20px 16px;
+      border-top:1px solid #f0f1f4; background:#fff;
+    }
+    .shop-footer-btn {
+      min-height:42px; display:flex; align-items:center; justify-content:center;
+      border-radius:12px; font-size:13px; font-weight:650;
+    }
+    .shop-directions-btn { width:100%; margin-bottom:8px; color:var(--sewdex-purple); background:#fff; border:1px solid #d9c7ff; }
+    .shop-directions-btn:hover { color:#fff; background:var(--sewdex-purple); border-color:var(--sewdex-purple); }
+    .shop-footer-secondary { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .shop-portfolio-btn { color:#465064; background:#fff; border:1px solid #dfe3eb; }
+    .shop-book-btn { color:#ed5b20; background:#fff; border:1px solid #ffc99f; }
+    .shop-footer-btn[hidden], .shop-quick-action[hidden], .shop-footer-secondary[hidden] { display:none !important; }
+
+    @media (max-width:575.98px) {
+      .shop-details-dialog { margin:.5rem auto; }
+      .shop-details-content { height:calc(100vh - 1rem); min-height:0; border-radius:15px; }
+      .shop-details-header,.shop-details-footer { padding-left:14px; padding-right:14px; }
+      .shop-details-body { padding:15px 14px 10px; }
+      .shop-quick-actions { gap:5px; }
+      .shop-quick-action { font-size:9px; }
+      .shop-detail-row { gap:8px; padding:10px; }
+      .shop-detail-btn { padding:6px 8px; }
+    }
+
+    @media (max-width: 991.98px) {
+      .shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .shops-shell { width: min(100% - 32px, 900px); }
+    }
+    @media (max-width: 575.98px) {
+      .browse-hero { min-height: 250px; padding: 18px 16px 70px; }
+      .hero-center { margin-top: 8px; }
+      .hero-icon { width: 58px; height: 58px; margin-bottom: 11px; font-size: 26px; }
+      .hero-center p { max-width: 280px; margin: auto; font-size: .84rem; }
+      .search-wrap { width: calc(100% - 24px); padding: 9px 11px; border-radius: 13px; }
+      .search-inner { gap: 8px; }
+      #shopSearch { font-size: .84rem; }
+      .refresh-btn { width: 38px; height: 38px; flex-basis: 38px; }
+      .shops-shell { width: calc(100% - 20px); margin-top: 12px; padding: 18px 12px 25px; border-radius: 19px 19px 0 0; }
+      .shop-grid { grid-template-columns: 1fr; gap: 12px; }
+      .shop-card { min-height: 125px; padding: 14px 11px; gap: 10px; }
+      .shop-avatar { flex-basis: 56px; width: 56px; height: 56px; border-radius: 15px; }
+      .shop-name { font-size: .9rem; }
+      .shop-owner { font-size: .73rem; }
+      .shop-location { font-size: .7rem; }
+      .shop-actions { flex-basis: 36px; gap: 6px; }
+      .action-btn { width: 36px; height: 36px; border-radius: 10px; }
+      .results-line { font-size: .76rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="browse-hero">
+    <a class="back-link" href="index.html" id="backToHome"><i class="bi bi-arrow-left"></i> Back</a>
+    <div class="hero-center">
+      <div class="hero-icon"><i class="bi bi-shop-window"></i></div>
+      <h1>Browse Shops</h1>
+      <p>Find and connect with seamstress shops near you</p>
+    </div>
+  </header>
+
+  <section class="search-wrap" aria-label="Search shops">
+    <div class="search-inner">
+      <i class="bi bi-search search-icon" aria-hidden="true"></i>
+      <input id="shopSearch" type="search" autocomplete="off"
+        placeholder="Search shops, owners, locations..."
+        aria-label="Search by shop name, owner or location">
+      <button class="refresh-btn" id="refreshShops" type="button" title="Refresh shops" aria-label="Refresh shops">
+        <i class="bi bi-arrow-clockwise" id="refreshIcon"></i>
+      </button>
+    </div>
+  </section>
+
+  <main class="shops-shell">
+    <div class="results-line">
+      <span id="resultCount" aria-live="polite">Loading shops...</span>
+      <span id="searchHint"></span>
+    </div>
+    <section class="shop-grid" id="shopGrid" aria-label="Shop results">
+      <div class="state-panel">
+        <div class="spinner-border loading-spinner" role="status"><span class="visually-hidden">Loading...</span></div>
+        <p class="mt-3">Loading shops...</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Upgraded Shop Details modal: existing ID retained for JavaScript compatibility -->
+  <div class="modal fade" id="shopDetailsModal" tabindex="-1" aria-labelledby="shopDetailsTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered shop-details-dialog">
+      <div class="modal-content shop-details-content">
+        <div class="modal-header shop-details-header">
+          <h2 class="modal-title" id="shopDetailsTitle">Shop Details</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body shop-details-body" id="shopDetailsBody"></div>
+        <div class="modal-footer shop-details-footer border-0">
+          <a class="btn shop-footer-btn shop-directions-btn" id="modalDirections" href="#" target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-send me-2"></i>Get Directions <i class="bi bi-box-arrow-up-right ms-1"></i>
+          </a>
+          <div class="shop-footer-secondary">
+            <a  id="modalPortfolio" href="#" target="_blank" rel="noopener noreferrer">
+              
+            </a>
+            <a id="modalBook" href="#" target="_blank" rel="noopener noreferrer">
+             
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    "use strict";
+
+    /*
+     * DEMO DATA:
+     * The uploaded project does not yet contain a shop database/backend API.
+     * These ten records make the page usable for layout and search testing.
+     * Replace this array with the real shop_onboarding data/API when available.
+     * Keep the property names: id, code, name, owner, address, town, district,
+     * State, phone, logo, latitude, longitude.
+     */
+    const SAMPLE_SHOPS = [
+      { id: "shop-001", code: "SD-001-2841", name: "AnaliTech Fashion Designs", owner: "Ahmad", address: "Tukuntawa Quarters, Kano State, Nigeria", town: "Kano", district: "Tukuntawa Sharada", State: "Kano State", phone: "+234 9122122044", email: "ahmadnura200@gmail.com", logo: "assets/img/logo.png", portfolioUrl: "https://www.instagram.com/yourshop", latitude: null, longitude: null },
+
+      { id: "shop-002", code: "SD-002-6947", name: "JN Tailoring Services", owner: "Jafar", address: "Tukuntawa, Kano State, Nigeria", town: "Kano", district: "Tukuntawa, Kano Munincipal.", State: "Kano State", phone: "07044762075", email: "", logo: "", latitude: null, longitude: null },
+      
+      { id: "shop-003", code: "SD-003-3732", name: "Amin Fashion designing", owner: "Aminu Muaz", address: "Tukuntawa, Kano Municipal , Kano State, Nigeria", town: "Kano", district: "Tukuntawa, Unguwar Nalado", State: "Kano State", phone: "09076154339", email: "", logo: "", latitude: null, longitude: null },
+      
+      { id: "shop-004", code: "SD-004-9806", name: "Saori Tailoring And Fashion Designs", owner: "Saori", address: "Tarauni, Kano State, Nigeria", town: "Kano", district: "Taurauni.", State: "Kano State", phone: "+234 9049626069", email: "", logo: "", latitude: null, longitude: null },
+      
+      { id: "shop-005", code: "SD-005-1874", name: "Habiba IA", owner: "Habiba Ismail Araba ", address: "Dutse, Jigawa State, Nigeria", town: "Dutse", district: "Dutse.", State: "Jigawa State", phone: "08139115879", email: "", logo: "", latitude: null, longitude: null },
+      
+      { id: "shop-006", code: "SD-006-4128", name: "SD Tailoring And fashion Designs", owner: "Sadiya Dambazau", address: "Gwale, Kano State, Nigeria", town: "Kano", district: "Gwale", State: "Kano State", phone: "09128803866 ", email: "", logo: "", latitude: null, longitude: null },
+      
+      { id: "shop-007", code: "SD-007-5620", name: "IIK Fashion Designs", owner: "Idris Ibrahim Khalid", address: "Kano State, Nigeria", town: "Kano", district: " ", State: "Kano State", phone: "+234 7019195060",  logo: "", latitude: null, longitude: null }
+      
+      // { id: "shop-008", code: "SD-008-7319", name: "Ama's Fashion House", owner: "Ama Serwaa", address: "Kumasi, Kumasi Metropolitan, Ashanti State, Nigeria", town: "Kano", district: "Kumasi Metropolitan", State: "Ashanti State", phone: "+233 24 000 1008", email: "gordysfashion@gmail.com", logo: "", latitude: null, longitude: null },
+      
+      // { id: "shop-009", code: "SD-009-8453", name: "Needle & Thread", owner: "Esi Boateng", address: "Tema, Tema Metropolitan, Kano State, Nigeria", town: "Kano", district: "Tema Metropolitan", State: "Kano State", phone: "+233 24 000 1009", email: "gordysfashion@gmail.com", logo: "", latitude: null, longitude: null },
+      
+      // { id: "shop-010", code: "SD-010-9264", name: "Classic Cuts", owner: "Yaw Asare", address: "Cape Coast, Cape Coast Metropolitan, Central State, Nigeria", town: "Kano", district: "Cape Coast Metropolitan", State: "Central State", phone: "+233 24 000 1010", email: "gordysfashion@gmail.com", logo: "", latitude: null, longitude: null },
+      
+      // { id: "shop-011", code: "SD-011-9264", name: "Gordy's fashion", owner: "Yaw Asare", address: "Cape Coast, Cape Coast Metropolitan, Central State, Nigeria", town: "Kano", district: "Cape Coast Metropolitan", State: "Central State", phone: "+233 24 000 1010", email: "gordysfashion@gmail.com", logo: "", latitude: null, longitude: null }
+      
+    ];
+
+    const shopGrid = document.getElementById("shopGrid");
+    const searchInput = document.getElementById("shopSearch");
+    const resultCount = document.getElementById("resultCount");
+    const searchHint = document.getElementById("searchHint");
+    const refreshButton = document.getElementById("refreshShops");
+    const refreshIcon = document.getElementById("refreshIcon");
+    const detailsModalElement = document.getElementById("shopDetailsModal");
+    const detailsModal = window.bootstrap ? new bootstrap.Modal(detailsModalElement) : null;
+
+    let allShops = [];
+    let refreshInProgress = false;
+
+    function normalize(value) {
+      return String(value ?? "")
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLocaleLowerCase()
+        .replace(/[^a-z0-9\s'-]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function shopSearchText(shop) {
+      return normalize([
+        shop.name, shop.owner, shop.address, shop.town,
+        shop.district, shop.State, shop.code
+      ].join(" "));
+    }
+
+    function getInitials(name) {
+      const words = String(name || "Shop").trim().split(/\s+/).filter(Boolean);
+      return words.slice(0, 2).map(word => word.charAt(0).toUpperCase()).join("") || "SH";
+    }
+
+    function createElement(tag, className, text) {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      if (text !== undefined) element.textContent = text;
+      return element;
+    }
+
+    function makeAvatar(shop) {
+      const avatar = createElement("div", "shop-avatar");
+      if (shop.logo) {
+        const image = document.createElement("img");
+        image.src = shop.logo;
+        image.alt = shop.name + " logo";
+        image.onerror = () => { avatar.textContent = getInitials(shop.name); };
+        avatar.appendChild(image);
+      } else {
+        avatar.textContent = getInitials(shop.name);
+      }
+      return avatar;
+    }
+
+    function getDirectionsUrl(shop) {
+      if (Number.isFinite(Number(shop.latitude)) && Number.isFinite(Number(shop.longitude))
+          && shop.latitude !== null && shop.longitude !== null
+          && shop.latitude !== "" && shop.longitude !== "") {
+        return "https://www.google.com/maps/dir/?api=1&destination=" +
+          encodeURIComponent(shop.latitude + "," + shop.longitude);
+      }
+      const location = [shop.address, shop.town, shop.district, shop.State].filter(Boolean).join(", ");
+      return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(location);
+    }
+
+    function createShopCard(shop) {
+      const card = createElement("article", "shop-card");
+      const avatar = makeAvatar(shop);
+
+      const info = createElement("div", "shop-info");
+      const name = createElement("h2", "shop-name", shop.name || "Unnamed shop");
+      name.title = shop.name || "Unnamed shop";
+      const owner = createElement("p", "shop-owner", "by " + (shop.owner || "Shop owner not provided"));
+      const location = createElement("p", "shop-location");
+      const locationIcon = createElement("i", "bi bi-geo-alt");
+      locationIcon.setAttribute("aria-hidden", "true");
+      const locationText = createElement("span", "", shop.address || [shop.town, shop.district, shop.State].filter(Boolean).join(", ") || "Location not provided");
+      location.append(locationIcon, locationText);
+
+      const code = createElement("span", "shop-code");
+      const codeIcon = createElement("i", "bi bi-send");
+      codeIcon.setAttribute("aria-hidden", "true");
+      code.append(codeIcon, document.createTextNode(" " + (shop.code || "Code unavailable")));
+
+      info.append(name, owner, location, code);
+
+      const actions = createElement("div", "shop-actions");
+      const directions = createElement("a", "action-btn");
+      directions.href = getDirectionsUrl(shop);
+      directions.target = "_blank";
+      directions.rel = "noopener noreferrer";
+      directions.title = "View shop location";
+      directions.setAttribute("aria-label", "Get directions to " + (shop.name || "shop"));
+      const directionsIcon = createElement("i", "bi bi-send");
+      directions.appendChild(directionsIcon);
+
+      const details = createElement("button", "action-btn details");
+      details.type = "button";
+      details.title = "View shop details";
+      details.setAttribute("aria-label", "View details for " + (shop.name || "shop"));
+      details.appendChild(createElement("i", "bi bi-chevron-right"));
+      details.addEventListener("click", () => showShopDetails(shop.id));
+
+      actions.append(directions, details);
+      card.append(avatar, info, actions);
+      return card;
+    }
+
+    function renderShops(shops, query = "") {
+      shopGrid.replaceChildren();
+      resultCount.textContent = shops.length + (shops.length === 1 ? " shop found" : " shops found");
+      searchHint.textContent = query ? "Search: “" + query + "”" : "";
+
+      if (shops.length === 0) {
+        const panel = createElement("div", "state-panel");
+        panel.appendChild(createElement("i", "bi bi-search"));
+        panel.appendChild(createElement("h3", "","No shops found matching your search."));
+        panel.appendChild(createElement("p", "", "Try another shop name, owner or location."));
+        shopGrid.appendChild(panel);
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      shops.forEach(shop => fragment.appendChild(createShopCard(shop)));
+      shopGrid.appendChild(fragment);
+    }
+
+    function filterShops(query) {
+      const normalizedQuery = normalize(query);
+      if (!normalizedQuery) {
+        renderShops(allShops);
+        return;
+      }
+      const terms = normalizedQuery.split(" ").filter(Boolean);
+      const matches = allShops.filter(shop => {
+        const searchable = shopSearchText(shop);
+        return terms.every(term => searchable.includes(term));
+      });
+      renderShops(matches, query.trim());
+    }
+
+    function showShopDetails(shopId) {
+      const shop = allShops.find(item => String(item.id) === String(shopId));
+      if (!shop) return;
+
+      const body = document.getElementById("shopDetailsBody");
+      body.replaceChildren();
+
+      // Build the shop identity area (logo or initials fallback).
+      const identity = createElement("div", "shop-details-identity");
+      const avatar = createElement("div", "modal-shop-avatar", getInitials(shop.name));
+      if (shop.logo) {
+        avatar.textContent = "";
+        const image = document.createElement("img");
+        image.src = shop.logo;
+        image.alt = (shop.name || "Shop") + " logo";
+        image.onerror = () => { avatar.textContent = getInitials(shop.name); };
+        avatar.appendChild(image);
+      }
+
+      const heading = createElement("div");
+      heading.append(
+        createElement("h3", "shop-details-name", shop.name || "Unnamed shop"),
+        createElement("p", "shop-details-owner", "by " + (shop.owner || "Shop owner"))
+      );
+      identity.append(avatar, heading);
+      body.appendChild(identity);
+
+      // Keep all five shortcut tiles visible for a consistent professional layout.
+      // A tile is disabled (not removed) when its contact/link data is not in the shop record.
+      const phone = String(shop.phone || "").trim();
+      const email = String(shop.email || "").trim();
+      const portfolioUrl = String(shop.portfolioUrl || shop.portfolio || shop.portfolio_url || "").trim();
+      const bookingUrl = String(shop.bookingUrl || shop.bookingLink || shop.booking_url || "").trim();
+      const digitsOnlyPhone = phone.replace(/\D/g, "");
+      const whatsappUrl = digitsOnlyPhone ? "https://wa.me/" + digitsOnlyPhone : "";
+
+      const quickActions = createElement("div", "shop-quick-actions");
+      const addQuickAction = (label, iconClass, styleClass, href) => {
+        const link = createElement(href ? "a" : "button", "shop-quick-action " + styleClass + (href ? "" : " is-unavailable"));
+        if (href) {
+          link.href = href;
+          if (href.startsWith("http")) {
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+          }
+        } else {
+          link.type = "button";
+          link.disabled = true;
+          link.title = label + " details have not been provided by this shop";
+          link.setAttribute("aria-label", label + " not provided");
+        }
+        const iconWrap = createElement("span", "quick-icon");
+        iconWrap.appendChild(createElement("i", iconClass));
+        link.append(iconWrap, createElement("span", "", label));
+        quickActions.appendChild(link);
+      };
+
+      addQuickAction("WhatsApp", "bi bi-whatsapp", "quick-whatsapp", whatsappUrl);
+      addQuickAction("Call", "bi bi-telephone", "quick-call", phone ? "tel:" + phone : "");
+      addQuickAction("Email", "bi bi-envelope", "quick-email", email ? "mailto:" + email : "");
+      addQuickAction("Portfolio", "bi bi-image", "quick-portfolio", portfolioUrl);
+    
+      body.appendChild(quickActions);
+
+      // Create detail rows safely with textContent (no shop data is inserted as HTML).
+      const addDetailRow = (label, value, iconClass, options = {}) => {
+        if (value === undefined || value === null || String(value).trim() === "") return;
+
+        const row = createElement("div", "shop-detail-row");
+        const icon = createElement("i", "shop-detail-icon " + iconClass);
+        const main = createElement("div", "shop-detail-main");
+        main.append(
+          createElement("div", "shop-detail-label", label),
+          createElement("p", "shop-detail-value", String(value))
+        );
+        row.append(icon, main);
+
+        if (options.phone && phone) {
+          const buttons = createElement("div", "shop-detail-buttons");
+          if (whatsappUrl) {
+            const whatsapp = createElement("a", "btn shop-detail-btn shop-btn-whatsapp", "WhatsApp");
+            whatsapp.href = whatsappUrl;
+            whatsapp.target = "_blank";
+            whatsapp.rel = "noopener noreferrer";
+            buttons.appendChild(whatsapp);
+          }
+          const call = createElement("a", "btn shop-detail-btn shop-btn-call", "Call");
+          call.href = "tel:" + phone;
+          buttons.appendChild(call);
+          row.appendChild(buttons);
+        }
+
+        if (options.email && email) {
+          const emailButton = createElement("a", "btn shop-detail-btn shop-btn-email", "Email");
+          emailButton.href = "mailto:" + email;
+          row.appendChild(emailButton);
+        }
+
+        body.appendChild(row);
+      };
+
+      addDetailRow("Phone", phone, "bi bi-telephone", { phone: true });
+      addDetailRow("Email", email, "bi bi-envelope", { email: true });
+      addDetailRow("Address", shop.address, "bi bi-geo-alt");
+      addDetailRow("Town", shop.town, "bi bi-geo");
+      addDetailRow("District", shop.district, "bi bi-map");
+      addDetailRow("State", shop.State, "bi bi-globe2");
+      addDetailRow("Digital Address", shop.digitalAddress || shop.digital_address, "bi bi-send");
+      addDetailRow("Working Hours", shop.workingHours || shop.working_hours, "bi bi-clock");
+      addDetailRow("Shop Identification Code", shop.code, "bi bi-upc");
+
+      // Keep the existing directions behaviour and support optional portfolio/booking links.
+      document.getElementById("modalDirections").href = getDirectionsUrl(shop);
+
+      const setOptionalFooterLink = (element, url, label) => {
+        element.href = url || "#";
+        element.classList.toggle("is-unavailable", !url);
+        element.setAttribute("aria-disabled", url ? "false" : "true");
+        element.setAttribute("aria-label", url ? label : label + " link not provided by this shop");
+        element.tabIndex = url ? 0 : -1;
+        element.onclick = url ? null : event => event.preventDefault();
+        element.title = url ? label : label + " link has not been provided by this shop";
+      };
+
+      const portfolioButton = document.getElementById("modalPortfolio");
+      setOptionalFooterLink(portfolioButton, portfolioUrl, "View Portfolio");
+
+      const bookButton = document.getElementById("modalBook");
+      setOptionalFooterLink(bookButton, bookingUrl, "Book Appointment");
+
+      // Keep both footer actions visible; unavailable links are visibly disabled.
+      const footerActions = document.querySelector(".shop-footer-secondary");
+      footerActions.hidden = false;
+      footerActions.style.gridTemplateColumns = "1fr 1fr";
+
+      if (detailsModal) {
+        detailsModal.show();
+      } else {
+        window.alert((shop.name || "Shop") + "\n" + (shop.address || "") + "\n" + (shop.code || ""));
+      }
+    }
+
+
+    async function loadShops() {
+      /*
+       * Current archive contains no server API. This async function is the
+       * single integration point to replace with fetch() or the existing
+       * onboarding service once its endpoint/backend is supplied.
+       */
+      await Promise.resolve();
+      return SAMPLE_SHOPS.map(shop => ({ ...shop }));
+    }
+
+    async function refreshShops() {
+      if (refreshInProgress) return;
+      refreshInProgress = true;
+      refreshButton.disabled = true;
+      refreshIcon.classList.add("spin");
+      refreshIcon.classList.remove("bi-arrow-clockwise");
+      refreshIcon.classList.add("bi-arrow-repeat");
+      resultCount.textContent = "Refreshing shops...";
+      shopGrid.innerHTML = '<div class="state-panel"><div class="spinner-border loading-spinner" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-3">Refreshing shop directory...</p></div>';
+
+      try {
+        allShops = await loadShops();
+        searchInput.value = "";
+        renderShops(allShops);
+      } catch (error) {
+        console.error("Unable to load shops:", error);
+        shopGrid.replaceChildren();
+        const panel = createElement("div", "state-panel");
+        panel.appendChild(createElement("i", "bi bi-exclamation-circle"));
+        panel.appendChild(createElement("h3", "", "Unable to load shops"));
+        panel.appendChild(createElement("p", "", "Please check your connection and try refreshing again."));
+        shopGrid.appendChild(panel);
+        resultCount.textContent = "Shop directory unavailable";
+      } finally {
+        refreshInProgress = false;
+        refreshButton.disabled = false;
+        refreshIcon.classList.remove("spin", "bi-arrow-repeat");
+        refreshIcon.classList.add("bi-arrow-clockwise");
+      }
+    }
+
+    searchInput.addEventListener("input", event => filterShops(event.target.value));
+    refreshButton.addEventListener("click", refreshShops);
+
+    // Initial render
+    refreshShops();
+  </script>
+</body>
+</html>
