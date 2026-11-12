@@ -3474,7 +3474,7 @@ section[id] {
     background: rgba(255,255,255,.85);
     backdrop-filter: blur(12px);
 
-    color: #7952d5;
+    color: #2f4bca;
     font-size: 20px;
 
     box-shadow: 0 8px 25px rgba(60,50,100,.12);
@@ -3484,7 +3484,7 @@ section[id] {
 }
 
 .showcase-arrow:hover {
-    background: #8054e9;
+    background: #4e63d8;
     color: #ffffff;
     transform: scale(1.1);
 }
@@ -3516,7 +3516,7 @@ section[id] {
 .showcase-pagination .swiper-pagination-bullet-active {
     width: 25px;
     border-radius: 10px;
-    background: #8054e9;
+    background: #4e63d8;
 }
 
 
@@ -3526,12 +3526,12 @@ section[id] {
     margin-top: 25px;
     text-align: center;
 
-    color: #88849d;
+    color: #647af3;
     font-size: 13px;
 }
 
 .showcase-bottom-text i {
-    color: #8054e9;
+    color: #5463e9;
     margin-right: 6px;
 }
 
